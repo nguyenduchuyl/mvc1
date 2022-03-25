@@ -18,18 +18,22 @@ class LoginController extends Controller
     }
 
     public function showLogin(){
+
         if(Auth::checkAuth()){
             return $this->redirect(Route::name('index'));
         }
 
         $_SESSION['test_session'] = 'TEST SESSION';
-        return $this->view('auth/login');
+        return $this->view('frontend/auth/login');
     }
     public function login()
     {
+
         $validate = Validator::validateEmpty($this->data, [
             'username','password'
         ]);
+        $_SESSION['test_session_2'] = 'TEST SESSION 2';
+
         if(!$validate['valid']){
             return $this->response([
                 'message' => $validate['message']
@@ -39,7 +43,7 @@ class LoginController extends Controller
         $loginResult = $this->authenticate->login($this->data['username'], $this->data['password']);
         if(!$loginResult){
             return $this->response([
-                'message' => 'Sai tên tài khoản hoặc mật khẩu'
+                'message' => 'Username or password is notcorect'
             ]);
         }
 
@@ -48,19 +52,37 @@ class LoginController extends Controller
 
     public function editProfile(){
         $user = Auth::user();
-        return $this->view('profile',compact('user'));
+        return $this->view('frontend/profile',compact('user'));
+    }
+
+    public function updateProfile(){
+
+        $user = Auth::user();
+
+        // TODO SOMETHING validate data
+        $names = $this->userRepository->analysisName($this->data['fullname']);
+        $this->data = array_merge($this->data, $names);
+
+        $user = $this->userRepository->updateUser($user, $this->data);
+        Auth::setUser($user);
+
+        return $this->editProfile();
     }
 
     public function logout(){
+
         Auth::logout();
-        return $this->redirect(Route::name('index'));
+
+        return $this->redirect(Route::name('auth.show-login'));
+
     }
+
 
     public function register()
     {
 
         $validate = Validator::validateEmpty($this->data, [
-            'username','password','re_password','fullname','date_of_birth'
+            'username','password','re_password','fullname','email','date_of_birth'
         ]);
 
         if(!$validate['valid']){
@@ -87,7 +109,7 @@ class LoginController extends Controller
         }
 
         return $this->response(['valid' => false]);
-
+            ///day bi loi
 
 
     }

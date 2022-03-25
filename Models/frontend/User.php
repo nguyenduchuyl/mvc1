@@ -5,7 +5,7 @@ class User extends Model{
 
     protected $table = 'user';
 
-    protected $defaul_avatar = 'public/avatar/NOIMAGE.jpg';
+    protected $default_avatar = 'public/avatar/NOIMAGE.jpg';
 
     protected $attributes = [
         'username',
@@ -14,7 +14,7 @@ class User extends Model{
         'first_name',
         'middle_name',
         'last_name',
-        'mail',
+        'email',
         'phone_number',
         'address',
         'avatar'
@@ -33,10 +33,14 @@ class User extends Model{
 
     public function getAvatar(){
 
-        if(is_null($this->avatar) || trim($this->avatar) !==  '' || !file_exists($this->avatar)){
-            return asset($this->defaul_avatar);
+        if(is_null($this->avatar) || trim($this->avatar) ==  '' || !file_exists($this->avatar)){
+            return asset($this->default_avatar);
         }
 
         return asset($this->avatar);
+    }
+    public function getDateOfBirth(){
+        return is_null($this->date_of_birth) || trim($this->date_of_birth) == "" ? "" :
+            dateFormat($this->date_of_birth);
     }
 }

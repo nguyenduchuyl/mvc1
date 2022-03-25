@@ -55,19 +55,19 @@
                             field: 'password',
                             message: 'Username cannot be the same as password'
                         },
-                        remote: {
-                            message: "That username is already in use",
-                            url: "<?php echo Route::name('auth.check-duplicate-username')?>",
-                            data: {
-                                username: 'username'
-                            },
-                            dataType: 'JSON',
-                            type: 'POST',
-                            delay: 2000     // Send Ajax request every 2 seconds
-                        }
+                        //remote: {
+                        //    message: "That username is already in use",
+                        //    url: "<?php //echo Route::name('auth.check-duplicate-username')?>//",
+                        //    data: {
+                        //        username: 'username'
+                        //    },
+                        //    type: 'POST',
+                        //    delay: 2000     // Send Ajax request every 2 seconds
+                        //}
+
                     }
                 },
-                mail: {
+                email: {
                     container: '.email-validate',
                     validators: {
                         notEmpty: {
@@ -104,7 +104,7 @@
                     }
                 },
 
-                full_name: {
+                fullname: {
                     container: '.fullname-validate',
                     validators: {
                         notEmpty: {
@@ -137,6 +137,11 @@
                     }
                 },
 
+            },
+            callback: {
+                callback: function(value, validator, $field) {
+                    console.log(value, validator,$field);
+                }
             }
         });
     }

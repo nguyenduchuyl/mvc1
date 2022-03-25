@@ -2,6 +2,9 @@
 
 class UserRepository{
 
+
+    protected $avatarPath = 'public/avatar/';
+
     public function createUser($data){
 
         $name = $this->analysisName($data['fullname']);
@@ -12,7 +15,8 @@ class UserRepository{
             'password' => md5($data['password']),
             'date_of_birth' => date_format(date_create($data['date_of_birth']), 'Y-m-d'),
             'phone_number' => $data['phone_number'],
-            'address' => $data['address']
+            'address' => $data['address'],
+            'avatar' => $data['avatar']
         ];
 
         $dataCreate = array_merge($dataCreate, $name);
@@ -20,9 +24,67 @@ class UserRepository{
         return (new User())->create($dataCreate);
     }
 
-    public function update(User $user){
+    function createUser1($data){
+
+        $filename = $this->avatarPath.$data['username'].'-'.time();
+        if (isset($data['avatar'])) {
+            if (is_string($data['avatar'])) {
+                $avatar = File::uploadBase64($data['avatar'], $filename);
+            } else {
+                $avatar = File::uploadFile($data['avatar'], $filename);
+            }
 
 
+        }
+        $name = $this->analysisName($data['fullname']);
+
+        $dataCreate = [
+            'username' => $data['username'],
+            'email'    => isset($data['email']) ? $data['email'] : '',
+            'password' => md5($data['password']),
+            'date_of_birth' => date_format(date_create($data['date_of_birth']), 'Y-m-d'),
+            'phone_number' => $data['phone_number'],
+            'address' => $data['address'],
+            'avatar'=> $avatar
+        ];
+
+
+        $dataCreate = array_merge($dataCreate, $name);
+
+        return (new User())->create($dataCreate);
+    }
+
+    public function updateUser($user, $data)
+    {
+
+        $avatar = $user->avatar;
+        $filename = $this->avatarPath.$user->username.'-'.time();
+        if (isset($data['avatar'])) {
+            if (is_string($data['avatar'])) {
+                $avatar = File::uploadBase64($data['avatar'], $filename);
+            } else {
+                $avatar = File::uploadFile($data['avatar'], $filename);
+            }
+
+            if (!$avatar) {
+                $avatar = $user->avatar;
+            }
+
+        }
+        $dataUpdate = array(
+        'avatar'        => $avatar,
+        'email'         => isset($data['email']) ? $data['email'] : $user->email,
+        'first_name'    => isset($data['first_name']) ? $data['first_name'] : $user->first_name,
+        'middle_name'   => isset($data['middle_name']) ? $data['middle_name'] : $user->middle_name,
+        'last_name'     => isset($data['last_name']) ? $data['last_name'] : $user->last_name,
+        'date_of_birth' => isset($data['date_of_birth']) ? dateFormat($data['date_of_birth'],'Y-m-d') : $user->date_of_birth,
+        'phone_number'  => isset($data['phone_number']) ? $data['phone_number']: $user->phone_number,
+            'address'   => isset($data['address']) ? $data['address']: $user->address
+        );
+
+        $user->update($dataUpdate);
+
+        return $user;
     }
 
     public function analysisName($name)
@@ -66,6 +128,8 @@ class UserRepository{
             ];
         }
     }
-
+    public function getAllUser(){
+        return (new User())->getList([],"ORDER BY 'first_name'");
+    }
 
 }

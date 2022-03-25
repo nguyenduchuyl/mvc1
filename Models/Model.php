@@ -83,14 +83,12 @@ class Model
         return $this->find($this->id);
     }
 
-    public function find($id)
-    {
-
-        $req = $this->db->prepare('SELECT * FROM ' . $this->table . ' WHERE id = :id and deleted_at <> NULL');
-        $req->execute(array('id' => $id));
+    public function find($id){
+        $query = "SELECT * FROM ".$this->table." WHERE id=? AND ISNULL(deleted_at)";
+        $req = $this->db->prepare($query);
+        $req->execute([$id]);
         $modelAttributes = $req->fetch();
-
-        if (!$modelAttributes) {
+        if(!$modelAttributes){
             return null;
         }
 
@@ -113,15 +111,64 @@ class Model
     public function getList($statements = [], $addQuery = '')
     {
 
-        $query = "SELECT * FROM {$this->table} WHERE " . implode(' AND ', $statements) . " AND ISNULL(deleted_at) " . $addQuery;
-        $listModels = $this->db->query($query)->fetchAll();
+        $statementsText = empty($statements) ? "WHERE" :
+            "WHERE ".implode(' AND ',$statements). " AND";
 
-        return array_map(function ($model) {
+        $query = "SELECT * FROM {$this->table} ".$statementsText." ISNULL(deleted_at) ".$addQuery;
+
+        $listModels = $this->db->query($query)->fetchAll();
+        return array_map(function($model){
             $user = new User();
             $user->setAttributes($model);
             return $user;
-        }, $listModels);
+        },$listModels);
     }
+    public function getListPostCate($statements = [], $addQuery = '')
+    {
 
+        $statementsText = empty($statements) ? "WHERE" :
+            "WHERE ".implode(' AND ',$statements). " AND";
 
+        $query = "SELECT * FROM {$this->table} ".$statementsText." ISNULL(deleted_at) ".$addQuery;
+
+        $listModels = $this->db->query($query)->fetchAll();
+
+        return array_map(function($model){
+            $post_cate = new Category();
+            $post_cate->setAttributes($model);
+            return $post_cate;
+        },$listModels);
+    }
+    public function getListPost($statements = [], $addQuery = '')
+    {
+
+        $statementsText = empty($statements) ? "WHERE" :
+            "WHERE ".implode(' AND ',$statements). " AND";
+
+        $query = "SELECT * FROM {$this->table} ".$statementsText." ISNULL(deleted_at) ".$addQuery;
+
+        $listModels = $this->db->query($query)->fetchAll();
+        return array_map(function($model){
+            $post = new Posts();
+            $post->setAttributes($model);
+            return $post;
+        },$listModels);
+    }
+    public function getCategoryParentId($parent_id){
+        $query = "SELECT * FROM {$this->table} WHERE parent_id = {$parent_id}";
+        $listModels = $this->db->query($query)->fetchAll();
+        return array_map(function($model){
+            $post_cate = new Category();
+            $post_cate->setAttributes($model);
+            return $post_cate;
+        },$listModels);
+    }
+    public function getCountParent($parent_id){
+        $query = "SELECT * FROM {$this->table} WHERE parent_id = {$parent_id}";
+        return $query->rowcount();
+    }
+    public function getCountParentLast($parent_id){
+        $query = "SELECT * FROM {$this->table} WHERE parent_id = {$parent_id} order by id desc limit 1";
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
 }

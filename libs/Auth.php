@@ -21,6 +21,8 @@ class Auth{
     }
 
     public function logout(){
+
         return Session::forget(AUTH_KEY);
     }
+
 }

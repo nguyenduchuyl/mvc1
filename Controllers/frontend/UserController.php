@@ -25,7 +25,7 @@ class UserController extends Controller{
 
         if(is_null($user)){
             return $this->response([
-                'message' => 'Không tìm thấy người dùng'
+                'message' => 'Khong thay nguoi dung'
             ]);
         }
 

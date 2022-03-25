@@ -1,14 +1,17 @@
 <?php
 
 require_once('Controllers/Controller.php');
-require_once('Models/frontend/User.php');
+
+require_once('Models/frontend/Category.php');
+require_once ('libs/Validator.php');
+require_once ('Models/frontend/User.php');
 
 class HomeController extends Controller{
 
     public function __construct(){
         parent::__construct();
-    }
 
+    }
     public function index(){
         $_SESSION['save'] = '1';
         return $this->view('frontend/index');

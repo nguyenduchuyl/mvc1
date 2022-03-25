@@ -14,8 +14,11 @@ function dump($data) {
         var_dump($data);
         print " &lt;=========";
     }
-} 
-
+}
+function dd($data){
+    dump($data);
+    die();
+}
 function containString($string, $array_match)
 {
     foreach ($array_match as $compare_string) {
